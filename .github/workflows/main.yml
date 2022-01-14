@@ -73,7 +73,7 @@ jobs:
               pip install wheel && \
               python setup.py install && \
              
-             
+              pip install pytest
              
               pytest && \
               codecov && \
