@@ -32,7 +32,6 @@ jobs:
         sudo ACCEPT_EULA=Y apt-get -y install msodbcsql17
         python -m pip install --upgrade pip
         pip install wheel
-        pip install -r requirements/${{ matrix.python-version }}.txt
         echo "Build minimal container for docker-in-docker diagnostics"
         docker build -f Dockerfile.diagnostics -t testcontainers-python .
         echo "Bare metal diagnostics"
