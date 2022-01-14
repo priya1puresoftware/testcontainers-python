@@ -25,16 +25,12 @@ jobs:
     - name: Test with pytest
       run: |
         conda install pytest
-        sudo apt-get install -y --no-install-recommends unixodbc-dev # required for pyodbc
-        curl https://packages.microsoft.com/keys/microsoft.asc | sudo apt-key add -
-        curl https://packages.microsoft.com/config/ubuntu/18.04/prod.list | sudo tee /etc/apt/sources.list.d/mssql-release.list
-        sudo apt-get -qq update
-        sudo ACCEPT_EULA=Y apt-get -y install msodbcsql17
         python -m pip install --upgrade pip
         pip install wheel
         pip install deprecation
-        
+        python setup.py install
+        pip install testcontainers
         pip install -r requirements.in
         py.test -sv --cov-config .coveragerc --cov-report html:skip-covered --cov-report term:skip-covered --cov=testcontainers --tb=short tests/
-        codecov
+        
         
