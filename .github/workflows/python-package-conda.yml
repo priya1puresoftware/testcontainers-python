@@ -1,0 +1,47 @@
+name: Python Package using Conda
+
+on: [push]
+
+jobs:
+  build-linux:
+    runs-on: ubuntu-latest
+    strategy:
+      max-parallel: 5
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python 3.8
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.8
+    - name: Add conda to system path
+      run: |
+        # $CONDA is an environment variable pointing to the root of the miniconda directory
+        echo $CONDA/bin >> $GITHUB_PATH
+    - name: Install dependencies
+      run: |
+        conda create -q -y --name testenv python=3.8 cython numpy pytest psutil pip
+        conda install -c conda-forge pip numpy scipy coverage scikit-learn!=0.19.0 matplotlib numba ffmpeg libsndfile pysoundfile coveralls
+    - name: Test with pytest
+      run: |
+        conda install pytest
+        sudo apt-get install -y --no-install-recommends unixodbc-dev # required for pyodbc
+        curl https://packages.microsoft.com/keys/microsoft.asc | sudo apt-key add -
+        curl https://packages.microsoft.com/config/ubuntu/18.04/prod.list | sudo tee /etc/apt/sources.list.d/mssql-release.list
+        sudo apt-get -qq update
+        sudo ACCEPT_EULA=Y apt-get -y install msodbcsql17
+        python -m pip install --upgrade pip
+        pip install wheel
+        pip install -r requirements/${{ matrix.python-version }}.txt
+        echo "Build minimal container for docker-in-docker diagnostics"
+        docker build -f Dockerfile.diagnostics -t testcontainers-python .
+        echo "Bare metal diagnostics"
+        python diagnostics.py
+        echo "Container diagnostics with bridge network"
+        docker run --rm -v /var/run/docker.sock:/var/run/docker.sock --network=bridge testcontainers-python python diagnostics.py          echo "Container diagnostics with host network"
+        docker run --rm -v /var/run/docker.sock:/var/run/docker.sock --network=host testcontainers-python python diagnostics.py
+        flake8
+        sphinx-build -nW docs docs/_build/html
+        py.test -sv --cov-config .coveragerc --cov-report html:skip-covered --cov-report term:skip-covered --cov=testcontainers --tb=short tests/
+        codecov
+        
