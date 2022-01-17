@@ -77,6 +77,6 @@ jobs:
               pip install kafka && \
               pip install redis && \
               pip install selenium && \
-              pytest && \
+              pytest -sv --cov-config .coveragerc --cov-report html:skip-covered --cov-report term:skip-covered --cov=testcontainers --tb=short tests/ && \
               codecov && \
               deactivate'     
