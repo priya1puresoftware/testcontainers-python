@@ -70,7 +70,7 @@ jobs:
               curl https://packages.microsoft.com/keys/microsoft.asc | apt-key add - && \
               curl https://packages.microsoft.com/config/ubuntu/18.04/prod.list | tee /etc/apt/sources.list.d/mssql-release.list && \
               apt-get -qq update && \
-              ACCEPT_EULA=Y apt-get -y install msodbcsql17 && \
+              export ACCEPT_EULA=Y apt-get -y install msodbcsql17 && \
               python3 -m pip install virtualenv && python3 -m venv py38-venv && \
               source py38-venv/bin/activate && \
               python -m pip install --upgrade pip && \
