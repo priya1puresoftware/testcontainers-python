@@ -31,7 +31,8 @@ jobs:
         python setup.py install
         pip install testcontainers
         pip install -r requirements.in
-        tox
+        pip3 install --force-reinstall --no-deps google-cloud-dataproc==1.1.1
+        pytest
   armv64_job:
       name: Build and Test for arm64
       runs-on: ubuntu-20.04
@@ -53,7 +54,8 @@ jobs:
               python setup.py install && \
               pip install testcontainers && \
               pip install -r requirements.in && \
-              tox && \
+              pip3 install --force-reinstall --no-deps google-cloud-dataproc==1.1.1 && \
+              pytest && \
               deactivate'      
         
         
